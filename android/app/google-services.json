@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1044625104839",
+    "project_id": "manage-assets-and-liabil-265e4",
+    "storage_bucket": "manage-assets-and-liabil-265e4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044625104839:android:b1a103a82bb169b51b83e2",
+        "android_client_info": {
+          "package_name": "com.vasanthyenuganti.mal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDx6Ol-mXtdDa_Fry0rOnFo0xfhxW9bkIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044625104839:android:0052fd9bf4d05de81b83e2",
+        "android_client_info": {
+          "package_name": "com.vasanthyenuganti.mal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDx6Ol-mXtdDa_Fry0rOnFo0xfhxW9bkIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
