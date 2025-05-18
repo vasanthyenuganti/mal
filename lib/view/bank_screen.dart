@@ -14,23 +14,29 @@ class BankScreen extends StatefulWidget {
 class _BankScreenState extends State<BankScreen> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<BankLoanModel>?>(
+    return FutureBuilder<List<BankLoanModel>>(
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CupertinoActivityIndicator());
         } else if (snapshot.hasData) {
           final loans = snapshot.data!;
-          return ListView.builder(
+          return ListView.separated(
             itemCount: loans.length,
             itemBuilder: (context, index) {
               final loan = loans[index];
               return ListTile(
                 onTap: () {
-                  // showLoanDetailsBottomSheet(context, loan);
+                  showLoanDetailsBottomSheet(context, loan);
                 },
                 visualDensity: const VisualDensity(vertical: -4),
-                title: Text(loan.bankName),
-                subtitle: Text(loan.loanDate),
+                title: Text(
+                  loan.bankName,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                subtitle: Text(
+                  loan.loanDate,
+                  style: const TextStyle(fontSize: 14),
+                ),
                 trailing: Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -38,16 +44,16 @@ class _BankScreenState extends State<BankScreen> {
                   children: [
                     Text(
                       "\$ ${loan.amount}",
-                      style: const TextStyle(fontSize: 15),
+                      style: const TextStyle(fontSize: 14),
                     ),
                     Text(
                       "(${loan.interest})",
-                      style: const TextStyle(fontSize: 15, color: Colors.red),
+                      style: const TextStyle(fontSize: 14, color: Colors.red),
                     ),
                   ],
                 ),
               );
-            },
+            }, separatorBuilder: (BuildContext context, int index) => Divider(),
           );
         } else {
           return const Center(child: Text("Issue"));
@@ -57,10 +63,7 @@ class _BankScreenState extends State<BankScreen> {
     );
   }
 
-  void showLoanDetailsBottomSheet(
-    BuildContext context,
-    Map<String, dynamic> loanDetails,
-  ) {
+  void showLoanDetailsBottomSheet(BuildContext context, BankLoanModel loan) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -83,33 +86,29 @@ class _BankScreenState extends State<BankScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               ListTile(
-                minLeadingWidth: -20,
+                minLeadingWidth: 0,
+                leading: Icon(Icons.near_me),
                 title: const Text(
                   "Loan Details",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
+                visualDensity: VisualDensity(vertical: -4, horizontal: -4),
                 trailing: IconButton(
                   onPressed: () {},
                   icon: const Icon(Icons.edit_outlined),
                 ),
               ),
-              const SizedBox(height: 16),
-              buildDetailRow("Bank Name", loanDetails['bank_name']),
-              buildDetailRow("Amount", "\$${loanDetails['amount']}"),
-              buildDetailRow("Loan Type", loanDetails['loan_type']),
-              buildDetailRow(
-                "Interest Rate",
-                "${loanDetails['interest_rate']}%",
-              ),
-              buildDetailRow("Loan Date", loanDetails['loan_date']),
-              buildDetailRow("Description", loanDetails['discreption']),
-              buildDetailRow("Loan Holder", loanDetails['loan_holder']),
-              buildDetailRow(
-                "Status",
-                loanDetails['status'] ? "Active" : "Inactive",
-              ),
+              const SizedBox(height: 8),
+              buildDetailRow("Bank Name", loan.bankName),
+              buildDetailRow("Amount", "\$${loan.amount}"),
+              buildDetailRow("Loan Type", loan.loanType),
+              buildDetailRow("Interest Rate", "${loan.interestRate}%"),
+              buildDetailRow("Loan Date", loan.loanDate),
+              buildDetailRow("Description", loan.description),
+              buildDetailRow("Loan Holder", loan.loanHolder),
+              buildDetailRow("Status", loan.status ? "Active" : "Inactive"),
               const SizedBox(height: 16),
               const Divider(thickness: 2, height: 2),
               const SizedBox(height: 16),
@@ -117,23 +116,23 @@ class _BankScreenState extends State<BankScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "${int.parse(loanDetails["amount"].toString())} + ${double.parse(loanDetails["interest"].toString()).toStringAsFixed(0)}",
+                    "${double.parse(loan.amount.toString())} + ${double.parse(loan.interest.toString()).toStringAsFixed(0)}",
                     style: const TextStyle(fontSize: 18),
                   ),
-                  // Text(
-                  //   "${int.parse(loanDetails["amount"].toString()) + int.parse(loanDetails["interest"].toString())}",
-                  //   style: const TextStyle(fontSize: 18),
-                  // ),
+                  Text(
+                    "= ${double.parse(loan.amount.toString()) + double.parse(loan.interest.toString())}",
+                    style: const TextStyle(fontSize: 18),
+                  ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Close"),
-                ),
-              ),
+              // const SizedBox(height: 16),
+              // Align(
+              //   alignment: Alignment.centerRight,
+              //   child: ElevatedButton(
+              //     onPressed: () => Navigator.pop(context),
+              //     child: const Text("Close"),
+              //   ),
+              // ),
             ],
           ),
         );

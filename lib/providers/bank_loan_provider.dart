@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mal/Models/bank_loan_model.dart';
 import 'package:dio/dio.dart';
-
 class BankLoanProvider extends ChangeNotifier {
   final Dio _dio = Dio();
   final double _banktotal = 0;
@@ -13,14 +11,18 @@ class BankLoanProvider extends ChangeNotifier {
   double get bankAmount => _bankamount;
   double get bankInteresr => _bankinterest;
 
-  Future<List<BankLoanModel>?> getBankLoans() async {
+  Future<List<BankLoanModel>> getBankLoans() async {
     final url =
-        "${dotenv.env["SUPABASE_PRO_URL"]!}/bank-loans/68222ecee4d5d1d8d99e94fe";
+        "https://mal-i8be.onrender.com/api/bank-loans/68222ecee4d5d1d8d99e94fe";
     try {
       final response = await _dio.get(url);
-      final List<dynamic> body = response.data;
-      final results = body.map((item) => BankLoanModel.fromJson(item)).toList();
-      return results;
+      if (response.statusCode == 200) {
+        final List<dynamic> body = response.data;
+        final results =
+            body.map((item) => BankLoanModel.fromJson(item)).toList();
+        return results;
+      }
+      return [];
     } catch (e) {
       return [];
     }

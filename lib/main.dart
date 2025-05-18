@@ -30,7 +30,7 @@ void main() async {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((value) {
         runApp(
-          kDebugMode ? DevicePreview(builder: (context) => MyCore()) : MyCore(),
+          kDebugMode && kIsWeb ? DevicePreview(builder: (context) => MyCore()) : MyCore(),
         );
       })
       .onError((error, stackTrace) {

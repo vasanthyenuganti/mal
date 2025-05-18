@@ -13,18 +13,20 @@ class CoinLoanProvider extends ChangeNotifier {
   double get coinAmount => _coinamount;
   double get coinInterest => _coininterest;
 
-
-  Future<List<OutsideLoanModel>?> getCoinLoans() async {
+  Future<List<OutsideLoanModel>> getCoinLoans() async {
     final url =
-        "${dotenv.env["SUPABASE_PRO_URL"]!}/outside-loans/68222ecee4d5d1d8d99e94fe";
+        "https://mal-i8be.onrender.com/api/outside-loans/68222ecee4d5d1d8d99e94fe";
     try {
       final response = await _dio.get(url);
-      final List<dynamic> body = response.data;
-      final results = body.map((item) => OutsideLoanModel.fromJson(item)).toList();
-      return results;
+      if (response.statusCode == 200) {
+        final List<dynamic> body = response.data;
+        final results =
+            body.map((item) => OutsideLoanModel.fromJson(item)).toList();
+        return results;
+      }
+      return [];
     } catch (e) {
       return [];
     }
   }
-
 }
