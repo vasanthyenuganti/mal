@@ -1,11 +1,19 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mal/services/outside_loan_service.dart';
+import 'package:mal/Models/outside_loan_model.dart';
+import 'package:mal/providers/coin_loan_provider.dart';
+import 'package:provider/provider.dart';
 
 class AddCoinRecordScreen extends StatefulWidget {
-  const AddCoinRecordScreen({super.key});
+  final bool isUpdate;
+  final OutsideLoanModel? outsideLoanModel;
+  const AddCoinRecordScreen({
+    super.key,
+    this.isUpdate = false,
+    this.outsideLoanModel,
+  });
 
   @override
   _AddCoinRecordScreenState createState() => _AddCoinRecordScreenState();
@@ -18,31 +26,7 @@ class _AddCoinRecordScreenState extends State<AddCoinRecordScreen> {
   final _interestRateController = TextEditingController();
   final _takenDateController = TextEditingController();
   final _descriptionController = TextEditingController();
-  bool _isLoading = false;
-
-  Future<void> addCoinRecord() async {
-    if (_formKey.currentState!.validate()) {
-      // Collect data from the text fields
-
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        // Insert the data into the Supabase table
-        final date = _takenDateController.text.trim().split("-");
-        
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Unexpected error: $e')),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
+  final bool _isLoading = false;
 
   Future<void> _selectLoanDate(BuildContext context) async {
     DateTime? selectedDate = await showDatePicker(
@@ -63,9 +47,7 @@ class _AddCoinRecordScreenState extends State<AddCoinRecordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Coin Record'),
-      ),
+      appBar: AppBar(title: const Text('Add Coin Record')),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -111,14 +93,16 @@ class _AddCoinRecordScreenState extends State<AddCoinRecordScreen> {
                     ),
                   ),
                   const SizedBox(
-                      width: 16), // Add spacing between the two fields
+                    width: 16,
+                  ), // Add spacing between the two fields
                   Expanded(
                     child: TextFormField(
                       controller: _interestRateController,
                       decoration: const InputDecoration(
                         labelText: 'Interest Rupee',
-                        prefixIcon:
-                            Icon(Icons.currency_rupee), // Percentage icon
+                        prefixIcon: Icon(
+                          Icons.currency_rupee,
+                        ), // Percentage icon
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {
@@ -143,8 +127,9 @@ class _AddCoinRecordScreenState extends State<AddCoinRecordScreen> {
                 controller: _takenDateController,
                 decoration: const InputDecoration(
                   labelText: 'Taken Date (YYYY-MM-DD)',
-                  prefixIcon:
-                      Icon(Icons.calendar_today_outlined), // Calendar icon
+                  prefixIcon: Icon(
+                    Icons.calendar_today_outlined,
+                  ), // Calendar icon
                 ),
                 keyboardType: TextInputType.datetime,
                 validator: (value) {
@@ -158,8 +143,10 @@ class _AddCoinRecordScreenState extends State<AddCoinRecordScreen> {
                   return null;
                 },
                 readOnly: true, // Make the TextFormField read-only
-                onTap: () =>
-                    _selectLoanDate(context), // Open date picker when tapped
+                onTap:
+                    () => _selectLoanDate(
+                      context,
+                    ), // Open date picker when tapped
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -177,17 +164,51 @@ class _AddCoinRecordScreenState extends State<AddCoinRecordScreen> {
                 child: SizedBox(
                   height: 55,
                   width: double.infinity,
-                  child: _isLoading
-                      ? const Center(child: CupertinoActivityIndicator())
-                      : ElevatedButton(
-                          onPressed: addCoinRecord,
-                          child: const Text(
-                            'Add Coin',
-                            style: TextStyle(fontSize: 18),
+                  child:
+                      _isLoading
+                          ? const Center(child: CupertinoActivityIndicator())
+                          : ElevatedButton(
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                await context
+                                    .read<CoinLoanProvider>()
+                                    .addCoinLoan(
+                                      OutsideLoanModel(
+                                        giversName:
+                                            _giverNameController.text.trim(),
+                                        amount:
+                                            double.tryParse(
+                                              _amountController.text
+                                                  .trim()
+                                                  .toString(),
+                                            ) ??
+                                            0.0,
+                                        interestRate:
+                                            double.tryParse(
+                                              _interestRateController.text
+                                                  .trim()
+                                                  .toString(),
+                                            ) ??
+                                            0.0,
+                                        takenDate:
+                                            _takenDateController.text.trim(),
+                                        status: true,
+                                        userId: "68222ecee4d5d1d8d99e94fe",
+                                      ),
+                                    );
+                                await context
+                                    .read<CoinLoanProvider>()
+                                    .getCoinLoans();
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: const Text(
+                              'Add Coin',
+                              style: TextStyle(fontSize: 18),
+                            ),
                           ),
-                        ),
                 ),
-              )
+              ),
             ],
           ),
         ),

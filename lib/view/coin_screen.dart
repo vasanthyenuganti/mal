@@ -88,30 +88,55 @@ class _CoinScreenState extends State<CoinScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              ListTile(
-                minLeadingWidth: 0,
-                leading: Icon(Icons.near_me),
+              AppBar(
+                leadingWidth: 0,
+                centerTitle: false,
+                backgroundColor: Colors.transparent,
+                // leading: Icon(Icons.near_me),
+                automaticallyImplyLeading: false,
                 title: const Text(
                   "Coin Details",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
-                visualDensity: VisualDensity(vertical: -4, horizontal: -4),
-                trailing: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.edit_outlined),
-                ),
+                actions: [
+                  CupertinoSwitch(value: loan.status, onChanged: (val) {}),
+                  SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () {},
+                    color: Colors.black,
+                    icon: const Icon(Icons.edit_outlined),
+                  ),
+                  SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () {},
+                    color: Colors.red,
+                    icon: const Icon(Icons.delete_outline),
+                  ),
+                ],
               ),
+              // ListTile(
+              //   minLeadingWidth: 0,
+              //   leading: Icon(Icons.near_me),
+              //   title: const Text(
+              //     "Coin Details",
+              //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              //   ),
+              //   visualDensity: VisualDensity(vertical: -4, horizontal: -4),
+              //   trailing: IconButton(
+              //     onPressed: () {},
+              //     icon: const Icon(Icons.edit_outlined),
+              //   ),
+              // ),
               const SizedBox(height: 8),
               buildDetailRow("Giver Name", loan.giversName),
               buildDetailRow("Amount", "\$${loan.amount}"),
               buildDetailRow("Interest Rate", "${loan.interestRate}%"),
               buildDetailRow("Loan Date", loan.takenDate),
-              buildDetailRow(
-                "Description",
-                loan.description.isEmpty
-                    ? "None"
-                    : loan.description,
-              ),
+              buildDetailRow("Description", loan.description ?? "None"),
               buildDetailRow("Status", loan.status ? "Active" : "Inactive"),
               const SizedBox(height: 16),
               const Divider(thickness: 2, height: 2),

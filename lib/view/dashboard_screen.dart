@@ -27,20 +27,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            const SizedBox(
-              height: 12,
-            ),
+            const SizedBox(height: 12),
             _indications(),
-            const SizedBox(
-              height: 24,
-            ),
-            // _statsTileView(
-            //     "Bank", context.read<BankLoanProvider>().getBankStats()),
-            // const SizedBox(
-            //   height: 24,
-            // ),
-            // _statsTileView(
-            //     "Coin", context.read<CoinLoanProvider>().getCoinStats())
+            const SizedBox(height: 24),
+            _bankStatsTileView(),
+            const SizedBox(height: 24),
+            _coinStatsTileView(),
           ],
         ),
       ),
@@ -48,7 +40,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   List<PieChartSectionData> _getSections(
-      double amount, double interest, double total) {
+    double amount,
+    double interest,
+    double total,
+  ) {
     return [
       PieChartSectionData(
         value: amount,
@@ -56,7 +51,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: ((amount / total) * 100).toStringAsFixed(0),
         radius: 35,
         titleStyle: const TextStyle(
-            fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
       ),
       PieChartSectionData(
         value: interest,
@@ -64,60 +62,86 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: ((interest / total) * 100).toStringAsFixed(0),
         radius: 35,
         titleStyle: const TextStyle(
-            fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
       ),
     ];
   }
 
-  Widget _statsTileView(String name, Stream<Map<String, num>> stream) {
+  Widget _bankStatsTileView() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const SizedBox(
-          width: 12,
-        ),
-        _statsTitle(name),
-        const SizedBox(
-          width: 12,
-        ),
+        const SizedBox(width: 12),
+        _statsTitle("Bank"),
+        const SizedBox(width: 12),
         SizedBox(
           height: 100,
           width: 100,
-          child: StreamBuilder<Map<String, num>>(
-            stream: stream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CupertinoActivityIndicator());
-              } else if (snapshot.hasError) {
-                return const Center(child: Icon(Icons.error));
-              } else if (snapshot.hasData) {
-                final data = snapshot.data!;
-                return PieChart(
+          child: Consumer<BankLoanProvider>(
+            builder:
+                (context, value, child) => PieChart(
                   PieChartData(
-                      sections: _getSections(
-                          double.parse(data['amount']!.toStringAsFixed(2)),
-                          double.parse(data['interest']!.toStringAsFixed(2)),
-                          double.parse(data['total']!.toStringAsFixed(2))),
-                      centerSpaceRadius: 35,
-                      sectionsSpace: 2,
-                      borderData: FlBorderData(show: false),
-                      pieTouchData: PieTouchData(
-                          enabled: true, touchCallback: (fl, pi) {})),
-                );
-              } else {
-                return const Center(child: Text('No data available'));
-              }
-            },
+                    sections: _getSections(
+                      double.parse(value.bankAmount.toStringAsFixed(0)),
+                      double.parse(value.bankInterest.toStringAsFixed(0)),
+                      double.parse(value.bankTotal.toStringAsFixed(0)),
+                    ),
+                    centerSpaceRadius: 35,
+                    sectionsSpace: 2,
+                    borderData: FlBorderData(show: false),
+                    pieTouchData: PieTouchData(
+                      enabled: true,
+                      touchCallback: (fl, pi) {},
+                    ),
+                  ),
+                ),
           ),
         ),
-        const SizedBox(
-          width: 12,
+        const SizedBox(width: 12),
+        _bankChipStats(),
+        const SizedBox(width: 12),
+      ],
+    );
+  }
+
+  Widget _coinStatsTileView() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(width: 12),
+        _statsTitle("Coin"),
+        const SizedBox(width: 12),
+        SizedBox(
+          height: 100,
+          width: 100,
+          child: Consumer<CoinLoanProvider>(
+            builder:
+                (context, value, child) => PieChart(
+                  PieChartData(
+                    sections: _getSections(
+                      double.parse(value.coinAmount.toStringAsFixed(0)),
+                      double.parse(value.coinInterest.toStringAsFixed(0)),
+                      double.parse(value.coinTotal.toStringAsFixed(0)),
+                    ),
+                    centerSpaceRadius: 35,
+                    sectionsSpace: 2,
+                    borderData: FlBorderData(show: false),
+                    pieTouchData: PieTouchData(
+                      enabled: true,
+                      touchCallback: (fl, pi) {},
+                    ),
+                  ),
+                ),
+          ),
         ),
-        name.toUpperCase() == "BANK" ? _bankChipStats() : _coinChipStats(),
-        const SizedBox(
-          width: 12,
-        ),
+        const SizedBox(width: 12),
+        _coinChipStats(),
+        const SizedBox(width: 12),
       ],
     );
   }
@@ -137,44 +161,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Chip(
-          avatar: const Icon(
-            Icons.circle_rounded,
-            color: Colors.blue,
-          ),
+          avatar: const Icon(Icons.circle_rounded, color: Colors.blue),
           label: Consumer<BankLoanProvider>(
-            builder: (context, value, child) => Text(
-              value.bankAmount.toStringAsFixed(2),
-              style: const TextStyle(fontSize: 15),
-            ),
+            builder:
+                (context, value, child) => Text(
+                  value.bankAmount.toStringAsFixed(0),
+                  style: const TextStyle(fontSize: 15),
+                ),
           ),
           backgroundColor: Colors.transparent,
         ),
         Chip(
-          avatar: const Icon(
-            Icons.circle_rounded,
-            color: Colors.red,
-          ),
+          avatar: const Icon(Icons.circle_rounded, color: Colors.red),
           label: Consumer<BankLoanProvider>(
-            builder: (context, value, child) => Text(
-              value.bankInteresr.toStringAsFixed(2),
-              style: const TextStyle(fontSize: 15),
-            ),
+            builder:
+                (context, value, child) => Text(
+                  value.bankInterest.toStringAsFixed(0),
+                  style: const TextStyle(fontSize: 15),
+                ),
           ),
           backgroundColor: Colors.transparent,
         ),
         Chip(
-          avatar: const Icon(
-            Icons.circle_rounded,
-            color: Colors.grey,
-          ),
+          avatar: const Icon(Icons.circle_rounded, color: Colors.grey),
           label: Consumer<BankLoanProvider>(
-            builder: (context, value, child) => Text(
-              value.bankTotal.toStringAsFixed(2),
-              style: const TextStyle(fontSize: 15),
-            ),
+            builder:
+                (context, value, child) => Text(
+                  value.bankTotal.toStringAsFixed(0),
+                  style: const TextStyle(fontSize: 15),
+                ),
           ),
           backgroundColor: Colors.transparent,
-        )
+        ),
       ],
     );
   }
@@ -184,44 +202,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Chip(
-          avatar: const Icon(
-            Icons.circle_rounded,
-            color: Colors.blue,
-          ),
+          avatar: const Icon(Icons.circle_rounded, color: Colors.blue),
           label: Consumer<CoinLoanProvider>(
-            builder: (context, value, child) => Text(
-              value.coinAmount.toStringAsFixed(2),
-              style: const TextStyle(fontSize: 15),
-            ),
+            builder:
+                (context, value, child) => Text(
+                  value.coinAmount.toStringAsFixed(0),
+                  style: const TextStyle(fontSize: 15),
+                ),
           ),
           backgroundColor: Colors.transparent,
         ),
         Chip(
-          avatar: const Icon(
-            Icons.circle_rounded,
-            color: Colors.red,
-          ),
+          avatar: const Icon(Icons.circle_rounded, color: Colors.red),
           label: Consumer<CoinLoanProvider>(
-            builder: (context, value, child) => Text(
-              value.coinInterest.toStringAsFixed(2),
-              style: const TextStyle(fontSize: 15),
-            ),
+            builder:
+                (context, value, child) => Text(
+                  value.coinInterest.toStringAsFixed(0),
+                  style: const TextStyle(fontSize: 15),
+                ),
           ),
           backgroundColor: Colors.transparent,
         ),
         Chip(
-          avatar: const Icon(
-            Icons.circle_rounded,
-            color: Colors.grey,
-          ),
+          avatar: const Icon(Icons.circle_rounded, color: Colors.grey),
           label: Consumer<CoinLoanProvider>(
-            builder: (context, value, child) => Text(
-              value.coinTotal.toStringAsFixed(2),
-              style: const TextStyle(fontSize: 15),
-            ),
+            builder:
+                (context, value, child) => Text(
+                  value.coinTotal.toStringAsFixed(0),
+                  style: const TextStyle(fontSize: 15),
+                ),
           ),
           backgroundColor: Colors.transparent,
-        )
+        ),
       ],
     );
   }
@@ -234,38 +246,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Chip(
-            avatar: Icon(
-              Icons.circle_rounded,
-              color: Colors.blue,
-            ),
-            label: Text(
-              "Amount",
-              style: TextStyle(fontSize: 15),
-            ),
+            avatar: Icon(Icons.circle_rounded, color: Colors.blue),
+            label: Text("Amount", style: TextStyle(fontSize: 15)),
             backgroundColor: Colors.transparent,
           ),
           Chip(
-            avatar: Icon(
-              Icons.circle_rounded,
-              color: Colors.red,
-            ),
-            label: Text(
-              "Interest",
-              style: TextStyle(fontSize: 15),
-            ),
+            avatar: Icon(Icons.circle_rounded, color: Colors.red),
+            label: Text("Interest", style: TextStyle(fontSize: 15)),
             backgroundColor: Colors.transparent,
           ),
           Chip(
-            avatar: Icon(
-              Icons.circle_rounded,
-              color: Colors.grey,
-            ),
-            label: Text(
-              "Total",
-              style: TextStyle(fontSize: 15),
-            ),
+            avatar: Icon(Icons.circle_rounded, color: Colors.grey),
+            label: Text("Total", style: TextStyle(fontSize: 15)),
             backgroundColor: Colors.transparent,
-          )
+          ),
         ],
       ),
     );

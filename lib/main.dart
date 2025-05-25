@@ -28,14 +28,14 @@ void main() async {
   );
   // restricting the orientation
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((value) {
-        runApp(
-          kDebugMode && kIsWeb ? DevicePreview(builder: (context) => MyCore()) : MyCore(),
-        );
-      })
-      .onError((error, stackTrace) {
-        throw Exception(error);
-      });
+  .then((value) {
+    runApp(
+      kDebugMode && kIsWeb ? DevicePreview(builder: (context) => MyCore()) : MyCore(),
+    );
+  })
+  .onError((error, stackTrace) {
+    throw Exception(error);
+  });
 }
 
 class MyCore extends StatelessWidget {
@@ -70,12 +70,14 @@ class MyApp extends StatelessWidget {
             child: child!,
           ),
       initialRoute: "/",
-      routes: {"/update-password": (_) => UpdatePasswordScreen()},
+      routes: {
+        "/" :(_) => MainScreen(),
+        "/update-password": (_) => UpdatePasswordScreen()},
       themeMode: ThemeMode.system,
       themeAnimationCurve: Curves.easeOutCirc,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      home: MainScreen(),
+      // home: MainScreen(),
     );
   }
 }

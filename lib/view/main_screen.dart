@@ -34,117 +34,120 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      initialIndex: _currentIndex,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Monitor Assets & Liabilities"),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  _showBottomSheet(context);
-                },
-                icon: const Icon(Icons.settings_outlined))
-          ],
-          bottom: TabBar(
-              onTap: (i) {
-                setState(() {
-                  _currentIndex = i;
-                });
-              },
-              indicatorWeight: 5,
-              tabs: const [
-                Tab(
-                  icon: Icon(Icons.dashboard_outlined),
-                  text: "Dashboard",
-                ),
-                Tab(
-                  icon: Icon(Icons.account_balance_outlined),
-                  text: "Bank",
-                ),
-                Tab(
-                  icon: Icon(Icons.monetization_on_outlined),
-                  text: "Coin",
-                ),
-              ]),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            if (_currentIndex == 0) {
-              updateHomeWidget();
-            }
-            if (_currentIndex == 1) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const AddLoanRecordScreen()));
-            }
-            if (_currentIndex == 2) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const AddCoinRecordScreen()));
-            }
-          },
-          child: Icon(_currentIndex == 0 ? Icons.widgets_outlined : Icons.add),
-        ),
-        bottomNavigationBar: BottomAppBar(
-          height: 50,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Chip(
-                avatar: const Icon(
-                  Icons.circle_rounded,
-                  color: Colors.blue,
-                ),
-                label: Consumer2<BankLoanProvider, CoinLoanProvider>(
-                    builder: (context, value, value2, child) => Text(
-                        _currentIndex == 0
-                            ? (value.bankAmount + value2.coinAmount)
-                                .toStringAsFixed(2)
-                            : _currentIndex == 1
-                                ? (value.bankAmount).toStringAsFixed(2)
-                                : (value2.coinAmount).toStringAsFixed(2))),
-                backgroundColor: Colors.transparent,
-              ),
-              Chip(
-                avatar: const Icon(
-                  Icons.circle_rounded,
-                  color: Colors.red,
-                ),
-                label: Consumer2<BankLoanProvider, CoinLoanProvider>(
-                    builder: (context, value, value2, child) => Text(
-                        _currentIndex == 0
-                            ? (value.bankInteresr + value2.coinInterest)
-                                .toStringAsFixed(2)
-                            : _currentIndex == 1
-                                ? (value.bankInteresr).toStringAsFixed(2)
-                                : (value2.coinInterest).toStringAsFixed(2))),
-                backgroundColor: Colors.transparent,
-              ),
-              Chip(
-                avatar: const Icon(
-                  Icons.circle_rounded,
-                  color: Colors.grey,
-                ),
-                label: Consumer2<BankLoanProvider, CoinLoanProvider>(
-                    builder: (context, value, value2, child) => Text(
-                        _currentIndex == 0
-                            ? (value.bankTotal + value2.coinTotal)
-                                .toStringAsFixed(2)
-                            : _currentIndex == 1
-                                ? (value.bankTotal).toStringAsFixed(2)
-                                : (value2.coinTotal).toStringAsFixed(2))),
-                backgroundColor: Colors.transparent,
-              )
+    return SafeArea(
+      top: true,
+      child: DefaultTabController(
+        length: 3,
+        initialIndex: _currentIndex,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text("Monitor Assets & Liabilities"),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    _showBottomSheet(context);
+                  },
+                  icon: const Icon(Icons.settings_outlined))
             ],
+            bottom: TabBar(
+                onTap: (i) {
+                  setState(() {
+                    _currentIndex = i;
+                  });
+                },
+                indicatorWeight: 5,
+                tabs: const [
+                  Tab(
+                    icon: Icon(Icons.dashboard_outlined),
+                    text: "Dashboard",
+                  ),
+                  Tab(
+                    icon: Icon(Icons.account_balance_outlined),
+                    text: "Bank",
+                  ),
+                  Tab(
+                    icon: Icon(Icons.monetization_on_outlined),
+                    text: "Coin",
+                  ),
+                ]),
           ),
-        ),
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _tabs,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              if (_currentIndex == 0) {
+                updateHomeWidget();
+              }
+              if (_currentIndex == 1) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AddLoanRecordScreen()));
+              }
+              if (_currentIndex == 2) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AddCoinRecordScreen()));
+              }
+            },
+            child: Icon(_currentIndex == 0 ? Icons.widgets_outlined : Icons.add),
+          ),
+          bottomNavigationBar: BottomAppBar(
+            height: 50,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Chip(
+                  avatar: const Icon(
+                    Icons.circle_rounded,
+                    color: Colors.blue,
+                  ),
+                  label: Consumer2<BankLoanProvider, CoinLoanProvider>(
+                      builder: (context, value, value2, child) => Text(
+                          _currentIndex == 0
+                              ? (value.bankAmount + value2.coinAmount)
+                                  .toStringAsFixed(0)
+                              : _currentIndex == 1
+                                  ? (value.bankAmount).toStringAsFixed(0)
+                                  : (value2.coinAmount).toStringAsFixed(0))),
+                  backgroundColor: Colors.transparent,
+                ),
+                Chip(
+                  avatar: const Icon(
+                    Icons.circle_rounded,
+                    color: Colors.red,
+                  ),
+                  label: Consumer2<BankLoanProvider, CoinLoanProvider>(
+                      builder: (context, value, value2, child) => Text(
+                          _currentIndex == 0
+                              ? (value.bankInterest + value2.coinInterest)
+                                  .toStringAsFixed(0)
+                              : _currentIndex == 1
+                                  ? (value.bankInterest).toStringAsFixed(0)
+                                  : (value2.coinInterest).toStringAsFixed(0))),
+                  backgroundColor: Colors.transparent,
+                ),
+                Chip(
+                  avatar: const Icon(
+                    Icons.circle_rounded,
+                    color: Colors.grey,
+                  ),
+                  label: Consumer2<BankLoanProvider, CoinLoanProvider>(
+                      builder: (context, value, value2, child) => Text(
+                          _currentIndex == 0
+                              ? (value.bankTotal + value2.coinTotal)
+                                  .toStringAsFixed(0)
+                              : _currentIndex == 1
+                                  ? (value.bankTotal).toStringAsFixed(0)
+                                  : (value2.coinTotal).toStringAsFixed(0))),
+                  backgroundColor: Colors.transparent,
+                )
+              ],
+            ),
+          ),
+          body: IndexedStack(
+            index: _currentIndex,
+            children: _tabs,
+          ),
         ),
       ),
     );

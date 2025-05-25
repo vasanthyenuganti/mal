@@ -53,7 +53,8 @@ class _BankScreenState extends State<BankScreen> {
                   ],
                 ),
               );
-            }, separatorBuilder: (BuildContext context, int index) => Divider(),
+            },
+            separatorBuilder: (BuildContext context, int index) => Divider(),
           );
         } else {
           return const Center(child: Text("Issue"));
@@ -87,18 +88,35 @@ class _BankScreenState extends State<BankScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              ListTile(
-                minLeadingWidth: 0,
-                leading: Icon(Icons.near_me),
+              AppBar(
+                leadingWidth: 0,
+                centerTitle: false,
+                backgroundColor: Colors.transparent,
+                // leading: Icon(Icons.near_me),
+                automaticallyImplyLeading: false,
                 title: const Text(
                   "Loan Details",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
-                visualDensity: VisualDensity(vertical: -4, horizontal: -4),
-                trailing: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.edit_outlined),
-                ),
+                actions: [
+                  CupertinoSwitch(value: loan.status, onChanged: (val) {}),
+                  SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () {},
+                    color: Colors.black,
+                    icon: const Icon(Icons.edit_outlined),
+                  ),
+                  SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () {},
+                    color: Colors.red,
+                    icon: const Icon(Icons.delete_outline),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               buildDetailRow("Bank Name", loan.bankName),
@@ -106,7 +124,7 @@ class _BankScreenState extends State<BankScreen> {
               buildDetailRow("Loan Type", loan.loanType),
               buildDetailRow("Interest Rate", "${loan.interestRate}%"),
               buildDetailRow("Loan Date", loan.loanDate),
-              buildDetailRow("Description", loan.description),
+              buildDetailRow("Description", loan.description ?? ""),
               buildDetailRow("Loan Holder", loan.loanHolder),
               buildDetailRow("Status", loan.status ? "Active" : "Inactive"),
               const SizedBox(height: 16),

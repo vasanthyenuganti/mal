@@ -1,10 +1,19 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mal/Models/bank_loan_model.dart';
+import 'package:mal/providers/bank_loan_provider.dart';
+import 'package:provider/provider.dart';
 
 class AddLoanRecordScreen extends StatefulWidget {
-  const AddLoanRecordScreen({super.key});
+  final bool isUpdate;
+  final BankLoanModel? bankLoanModel;
+  const AddLoanRecordScreen({
+    super.key,
+    this.isUpdate = false,
+    this.bankLoanModel,
+  });
 
   @override
   _AddLoanRecordScreenState createState() => _AddLoanRecordScreenState();
@@ -19,7 +28,7 @@ class _AddLoanRecordScreenState extends State<AddLoanRecordScreen> {
   final _loanDateController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _holderNameController = TextEditingController();
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   final List<String> _loanTypes = [
     'Home Loan',
@@ -76,29 +85,6 @@ class _AddLoanRecordScreenState extends State<AddLoanRecordScreen> {
     'Andhra Pragathi Grameena Bank', // Added Andhra Pragathi Grameena Bank
   ];
 
-  Future<void> addLoanRecord() async {
-    if (_formKey.currentState!.validate()) {
-      // Collect data from the text fields
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        // Insert the data into the Supabase table
-        final date = _loanDateController.text.trim().split("-");
-        
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Unexpected error: $e')),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
   Future<void> _selectLoanDate(BuildContext context) async {
     DateTime? selectedDate = await showDatePicker(
       context: context,
@@ -118,9 +104,7 @@ class _AddLoanRecordScreenState extends State<AddLoanRecordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Bank Loan'),
-      ),
+      appBar: AppBar(title: const Text('Add Bank Loan')),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -134,23 +118,30 @@ class _AddLoanRecordScreenState extends State<AddLoanRecordScreen> {
                   if (textEditingValue.text.isEmpty) {
                     return const Iterable<String>.empty();
                   }
-                  return _bankNames.where((bank) => bank
-                      .toLowerCase()
-                      .contains(textEditingValue.text.toLowerCase()));
+                  return _bankNames.where(
+                    (bank) => bank.toLowerCase().contains(
+                      textEditingValue.text.toLowerCase(),
+                    ),
+                  );
                 },
                 onSelected: (String selection) {
                   // Handle the selection
                   _bankNameController.text = selection;
                 },
-                fieldViewBuilder:
-                    (context, controller, focusNode, onEditingComplete) {
+                fieldViewBuilder: (
+                  context,
+                  controller,
+                  focusNode,
+                  onEditingComplete,
+                ) {
                   return TextFormField(
                     controller: controller,
                     focusNode: focusNode,
                     decoration: const InputDecoration(
                       labelText: 'Bank Name',
-                      prefixIcon:
-                          Icon(Icons.account_balance_outlined), // Bank icon
+                      prefixIcon: Icon(
+                        Icons.account_balance_outlined,
+                      ), // Bank icon
                     ),
                     onEditingComplete: onEditingComplete,
                     validator: (value) {
@@ -186,14 +177,16 @@ class _AddLoanRecordScreenState extends State<AddLoanRecordScreen> {
                     ),
                   ),
                   const SizedBox(
-                      width: 16), // Add spacing between the two fields
+                    width: 16,
+                  ), // Add spacing between the two fields
                   Expanded(
                     child: TextFormField(
                       controller: _interestRateController,
                       decoration: const InputDecoration(
                         labelText: 'Interest Rate',
-                        prefixIcon:
-                            Icon(Icons.percent_outlined), // Percentage icon
+                        prefixIcon: Icon(
+                          Icons.percent_outlined,
+                        ), // Percentage icon
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {
@@ -220,16 +213,22 @@ class _AddLoanRecordScreenState extends State<AddLoanRecordScreen> {
                   if (textEditingValue.text.isEmpty) {
                     return const Iterable<String>.empty();
                   }
-                  return _loanTypes.where((loanType) => loanType
-                      .toLowerCase()
-                      .contains(textEditingValue.text.toLowerCase()));
+                  return _loanTypes.where(
+                    (loanType) => loanType.toLowerCase().contains(
+                      textEditingValue.text.toLowerCase(),
+                    ),
+                  );
                 },
                 onSelected: (String selection) {
                   // Handle the selection
                   _loanTypeController.text = selection;
                 },
-                fieldViewBuilder:
-                    (context, controller, focusNode, onEditingComplete) {
+                fieldViewBuilder: (
+                  context,
+                  controller,
+                  focusNode,
+                  onEditingComplete,
+                ) {
                   return TextFormField(
                     controller: controller,
                     focusNode: focusNode,
@@ -252,8 +251,9 @@ class _AddLoanRecordScreenState extends State<AddLoanRecordScreen> {
                 controller: _loanDateController,
                 decoration: const InputDecoration(
                   labelText: 'Loan Date (YYYY-MM-DD)',
-                  prefixIcon:
-                      Icon(Icons.calendar_today_outlined), // Calendar icon
+                  prefixIcon: Icon(
+                    Icons.calendar_today_outlined,
+                  ), // Calendar icon
                 ),
                 keyboardType: TextInputType.datetime,
                 validator: (value) {
@@ -267,8 +267,10 @@ class _AddLoanRecordScreenState extends State<AddLoanRecordScreen> {
                   return null;
                 },
                 readOnly: true, // Make the TextFormField read-only
-                onTap: () =>
-                    _selectLoanDate(context), // Open date picker when tapped
+                onTap:
+                    () => _selectLoanDate(
+                      context,
+                    ), // Open date picker when tapped
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -300,17 +302,54 @@ class _AddLoanRecordScreenState extends State<AddLoanRecordScreen> {
                 child: SizedBox(
                   height: 55,
                   width: double.infinity,
-                  child: _isLoading
-                      ? const Center(child: CupertinoActivityIndicator())
-                      : ElevatedButton(
-                          onPressed: addLoanRecord,
-                          child: const Text(
-                            'Add Loan',
-                            style: TextStyle(fontSize: 18),
+                  child:
+                      _isLoading
+                          ? const Center(child: CupertinoActivityIndicator())
+                          : ElevatedButton(
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                await context
+                                    .read<BankLoanProvider>()
+                                    .addBankLoan(
+                                      BankLoanModel(
+                                        bankName:
+                                            _bankNameController.text.trim(),
+                                        amount:
+                                            double.tryParse(
+                                              _amountController.text.toString(),
+                                            ) ??
+                                            0.0,
+                                        loanType:
+                                            _loanTypeController.text.trim(),
+                                        interestRate:
+                                            double.tryParse(
+                                              _interestRateController.text
+                                                  .toString(),
+                                            ) ??
+                                            0.0,
+                                        loanDate:
+                                            _loanDateController.text.trim(),
+                                        userId: "68222ecee4d5d1d8d99e94fe",
+                                        status: true,
+                                        description:
+                                            _descriptionController.text.trim(),
+                                        loanHolder:
+                                            _holderNameController.text.trim(),
+                                      ),
+                                    );
+                                await context
+                                    .read<BankLoanProvider>()
+                                    .getBankLoans();
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: const Text(
+                              'Add Loan',
+                              style: TextStyle(fontSize: 18),
+                            ),
                           ),
-                        ),
                 ),
-              )
+              ),
             ],
           ),
         ),
